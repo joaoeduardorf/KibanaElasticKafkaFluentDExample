@@ -1,0 +1,109 @@
+version: '3.9'
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper-log
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2182:2181" # Porta alternativa para Zookeeper
+    networks:
+      - default
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka-log
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=INSIDE://kafka:9092,OUTSIDE://localhost:29092
+      - KAFKA_LISTENERS=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:29092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE 
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+      - "9092:9092"  
+    networks:
+      - default
+
+  fluentd:
+    build:
+     context: ./fluentd
+    ports:
+     - "24224:24224"
+     - "24224:24224/udp"
+    depends_on:
+     - kafka
+     - zookeeper
+     - elasticsearch
+    networks:
+      - default
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.16.1
+    container_name: logstash-log
+    environment:
+    - xpack.monitoring.elasticsearch.hosts=http://elasticsearch-log:9200
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logstash/http_ca.crt:/usr/share/logstash/config/certs/http_ca.crt
+    ports:
+      - "5044:5044"
+    networks:
+      - default
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+    container_name: elasticsearch-log
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false 
+      xpack.security.enrollment.enabled: false
+    ports:
+      - "9200:9200"
+    networks:
+      - default
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.16.1
+    container_name: kibana-log
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch-log:9200
+    volumes:
+        - ./fluentd/http_ca.crt:/usr/share/kibana/config/certs/http_ca.crt
+    networks:
+      - default
+
+  app:
+    container_name: app-log
+    build:
+      context: ./WebApplicationExample
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+    depends_on:
+      - fluentd
+      - elasticsearch
+      - logstash 
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "app.logs"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+        
