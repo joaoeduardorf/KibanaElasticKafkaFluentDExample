@@ -2,12 +2,16 @@ using Serilog;
 using WebApplicationExample.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHealthChecks();
+
 // Configure Serilog for JSON logs
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
 
 // Add services to the container.
 
@@ -17,6 +21,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.MapHealthChecks("/health");
 
 // Use Middleware
 app.UseMiddleware<RequestResponseLoggingMiddleware>();

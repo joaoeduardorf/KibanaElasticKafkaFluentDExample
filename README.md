@@ -146,16 +146,18 @@ docker logs fluentd
 
 ````plaintext
 .
-├── app/                      # Aplicação em .NET 8
-│   ├── Controllers/          # Controladores da API
-│   ├── Middleware/           # Middleware para logging
-│   ├── Program.cs            # Ponto de entrada
-│   └── app.csproj            # Arquivo do projeto .NET
+├── KibanaElasticKafkaFluentDExample/   # Aplicação em .NET 8
+│   ├── Controllers/                    # Controladores da API
+│   ├── Middleware/                     # Middleware para logging
+│   ├── Program.cs                      # Ponto de entrada
+│   └── app.csproj                      # Arquivo do projeto .NET
 ├── fluentd/
-│   ├── Dockerfile            # Dockerfile personalizado para o FluentD
-│   ├── fluent.conf           # Configuração do FluentD
-├── docker-compose.yml        # Configuração do Docker Compose
-└── README.md                 # Documentação
+│   ├── Dockerfile                      # Dockerfile personalizado para o FluentD
+│   ├── fluent.conf                     # Configuração do FluentD
+├── logstash/
+│   ├── logstash.conf                   # Configuração do logstash
+├── docker-compose.yml                  # Configuração do Docker Compose
+└── README.md                           # Documentação
 ````
 
 ---
