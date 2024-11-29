@@ -7,10 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplicationExample", "We
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4FA4D397-D85A-4C1E-BF8C-EB9CDE26B8AF}"
 	ProjectSection(SolutionItems) = preProject
+		logstash\application-template.json = logstash\application-template.json
 		docker-compose.yml = docker-compose.yml
-		logstash\logstash.conf = logstash\logstash.conf
-		fluentd\Dockerfile. = fluentd\Dockerfile.
+		fluentd\Dockerfile = fluentd\Dockerfile
 		fluentd\fluent.conf = fluentd\fluent.conf
+		logstash\logstash.conf = logstash\logstash.conf
 		README.md = README.md
 	EndProjectSection
 EndProject

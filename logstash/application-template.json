@@ -1,0 +1,35 @@
+{
+  "index_patterns": [ "my-space-application-logs-*" ],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": { "type": "date" },
+        "Timestamp": { "type": "date" },
+        "service": { "type": "keyword" },
+        "environment": { "type": "keyword" },
+        "Request": {
+          "properties": {
+            "Method": { "type": "keyword" },
+            "Path": { "type": "text" },
+            "QueryString": { "type": "text" },
+            "Headers": { "type": "object" },
+            "Body": { "type": "text" }
+          }
+        },
+        "Response": {
+          "properties": {
+            "StatusCode": { "type": "integer" },
+            "Headers": { "type": "object" },
+            "Body": { "type": "text" }
+          }
+        },
+        "ExecutionTimeMs": { "type": "float" }
+      }
+    }
+  },
+  "priority": 100
+}
